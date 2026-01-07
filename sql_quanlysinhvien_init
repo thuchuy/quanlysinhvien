@@ -1,0 +1,70 @@
+-- 1. Tạo Database
+CREATE DATABASE QuanLySinhVien CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE QuanLySinhVien;
+
+-- 2. Bảng Khoa
+CREATE TABLE Khoa (
+    MaKhoa VARCHAR(10) PRIMARY KEY,
+    TenKhoa NVARCHAR(100) NOT NULL
+);
+
+-- 3. Bảng Lop (Lớp học)
+CREATE TABLE Lop (
+    MaLop VARCHAR(10) PRIMARY KEY,
+    TenLop NVARCHAR(100) NOT NULL,
+    MaKhoa VARCHAR(10),
+    FOREIGN KEY (MaKhoa) REFERENCES Khoa(MaKhoa) ON DELETE CASCADE
+);
+
+-- 4. Bảng SinhVien (Sinh viên)
+CREATE TABLE SinhVien (
+    MaSV VARCHAR(15) PRIMARY KEY,
+    HoTen NVARCHAR(100) NOT NULL,
+    NgaySinh DATE,
+    GioiTinh BOOLEAN, -- 1: Nam, 0: Nữ
+    QueQuan NVARCHAR(255),
+    MaLop VARCHAR(10),
+    FOREIGN KEY (MaLop) REFERENCES Lop(MaLop) ON DELETE SET NULL
+);
+
+-- 5. Bảng MonHoc (Môn học)
+CREATE TABLE MonHoc (
+    MaMH VARCHAR(10) PRIMARY KEY,
+    TenMH NVARCHAR(100) NOT NULL,
+    SoTinChi INT CHECK (SoTinChi > 0)
+);
+
+-- 6. Bảng KetQua (Điểm số)
+CREATE TABLE KetQua (
+    MaSV VARCHAR(15),
+    MaMH VARCHAR(10),
+    DiemThanhPhan FLOAT CHECK (DiemThanhPhan >= 0 AND DiemThanhPhan <= 10),
+    DiemThi FLOAT CHECK (DiemThi >= 0 AND DiemThi <= 10),
+    PRIMARY KEY (MaSV, MaMH), -- Khóa chính hỗn hợp
+    FOREIGN KEY (MaSV) REFERENCES SinhVien(MaSV) ON DELETE CASCADE,
+    FOREIGN KEY (MaMH) REFERENCES MonHoc(MaMH) ON DELETE CASCADE
+);
+
+-- Thêm Khoa
+INSERT INTO Khoa VALUES ('CNTT', 'Công nghệ thông tin'), ('KT', 'Kinh tế');
+
+-- Thêm Lớp
+INSERT INTO Lop VALUES ('IT01', 'Kỹ thuật phần mềm 1', 'CNTT'), ('KT01', 'Kế toán doanh nghiệp', 'KT');
+
+-- Thêm Sinh viên
+INSERT INTO SinhVien VALUES 
+('SV001', 'Nguyễn Văn A', '2003-05-15', 1, 'Hà Nội', 'IT01'),
+('SV002', 'Trần Thị B', '2003-11-20', 0, 'Đà Nẵng', 'IT01'),
+('SV003', 'Lê Văn C', '2002-02-10', 1, 'TP.HCM', 'KT01');
+
+-- Thêm Môn học
+INSERT INTO MonHoc VALUES 
+('CSDL', 'Cơ sở dữ liệu', 3), 
+('LTW', 'Lập trình Web', 4),
+('KTCT', 'Kinh tế chính trị', 2);
+
+-- Thêm Điểm
+INSERT INTO KetQua VALUES 
+('SV001', 'CSDL', 8.5, 7.0),
+('SV001', 'LTW', 9.0, 8.5),
+('SV002', 'CSDL', 7.0, 6.5);
